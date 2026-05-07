@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Finance Pro SaaS</title>
+
+<style>
+:root{
+    --bg:#0b1120;
+    --card:#111827;
+    --text:#fff;
+    --accent:#00eaff;
+    --danger:#ff3b3b;
+    --green:#22c55e;
+}
+
+*{
+    box-sizing:border-box;
+    font-family:Arial;
+}
+
+body{
+    margin:0;
+    display:flex;
+    background:var(--bg);
+    color:var(--text);
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:240px;
+    height:100vh;
+    background:var(--card);
+    padding:20px;
+    border-right:1px solid #1f2937;
+}
+
+.sidebar h2{
+    color:var(--accent);
+}
+
+/* BUTTONS */
+.btn{
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.btn-primary{
+    background:linear-gradient(135deg,var(--accent),#3b82f6);
+    color:black;
+}
+    
+    .Add{
+    background:linear-gradient(135deg,var(--accent),#3b82f6);
+    color:black;
+     width:100%;
+    margin-top:10px;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.btn-danger{
+    background:linear-gradient(135deg,var(--danger),#f97316);
+    color:white;
+}
+
+.btn:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 12px rgba(0,234,255,0.5);
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    padding:25px;
+}
+
+/* CARDS (2 في الصف) */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+    margin-top:20px;
+}
+
+.card{
+    background:var(--card);
+    padding:18px;
+    border-radius:16px;
+    border:1px solid #1f2937;
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-6px) scale(1.03);
+    box-shadow:0 0 18px rgba(0,234,255,0.4);
+}
+
+/* FORM */
+.form{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+input,select{
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #1f2937;
+    background:#0b1120;
+    color:white;
+}
+
+/* HISTORY */
+.item{
+    margin-top:12px;
+    padding:16px;
+    background:#111827;
+    border-radius:16px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.income{border-left:5px solid #22c55e;}
+.expense{border-left:5px solid #ff3b3b;}
+.saving{border-left:5px solid #00eaff;}
+.ahly{border-left:5px solid gold;}
+.telda{border-left:5px solid violet;}
+.magdy{border-left:5px solid orange;}
+    
+    
+    
+    
+    @media(max-width:700px){
+    .sidebar{
+        display:none;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .form{
+        flex-direction:column;
+    }
+
+    .Add{
+        width:100%;
+    }
+}
+    
+    
+    .Add:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 12px rgba(0,234,255,0.5);
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>💰 Finance Pro</h2>
+
+    <button class="btn btn-primary" onclick="exportData()">Export</button>
+    <button class="btn btn-danger" onclick="reset()">Reset</button>
+</div>
+
+<div class="main">
+
+<h2>Dashboard 📊</h2>
+
+<div class="cards">
+    <div class="card"><h3>Balance</h3><p id="balance">0</p></div>
+    <div class="card"><h3>Income</h3><p id="income">0</p></div>
+    <div class="card"><h3>Expense</h3><p id="expense">0</p></div>
+    <div class="card"><h3>Savings</h3><p id="saving">0</p></div>
+    <div class="card"><h3>Ahly</h3><p id="ahly">0</p></div>
+    <div class="card"><h3>Telda</h3><p id="telda">0</p></div>
+    <div class="card"><h3>Magdy</h3><p id="magdy">0</p></div>
+</div>
+
+<div class="form">
+    <input id="amount" type="number" placeholder="Amount">
+
+    <select id="type">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+        <option value="saving">Saving</option>
+        <option value="ahly">Ahly</option>
+        <option value="telda">Telda</option>
+        <option value="magdy">Magdy</option>
+    </select>
+
+    <select id="category">
+        <option>Food</option>
+        <option>Transport</option>
+        <option>Work</option>
+        <option>Other</option>
+    </select>
+
+    <button  class="Add"onclick="add()">+ Add</button>
+</div>
+
+<div id="list"></div>
+
+</div>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("finance_pro_v2")) || {
+    balance:0,
+    income:0,
+    expense:0,
+    saving:0,
+    ahly:0,
+    telda:0,
+    magdy:0,
+    transactions:[]
+};
+
+function add(){
+    let amount = Number(document.getElementById("amount").value);
+    let type = document.getElementById("type").value;
+    let category = document.getElementById("category").value;
+
+    if(!amount) return;
+
+    data.transactions.push({amount,type,category,date:new Date().toLocaleDateString()});
+
+    if(type==="income"){data.income+=amount; data.balance+=amount;}
+    if(type==="expense"){data.expense+=amount; data.balance-=amount;}
+
+    if(["saving","ahly","telda","magdy"].includes(type)){
+        if(data.balance>=amount){
+            data[type]+=amount;
+            data.balance-=amount;
+        } else return alert("No balance");
+    }
+
+    save(); render();
+}
+
+function reset(){
+    data={balance:0,income:0,expense:0,saving:0,ahly:0,telda:0,magdy:0,transactions:[]};
+    save(); render();
+}
+
+function exportData(){
+    let blob=new Blob([JSON.stringify(data)],{type:"application/json"});
+    let a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="finance.json";
+    a.click();
+}
+
+function save(){
+    localStorage.setItem("finance_pro_v2",JSON.stringify(data));
+}
+
+function render(){
+    balance.innerText=data.balance;
+    income.innerText=data.income;
+    expense.innerText=data.expense;
+    saving.innerText=data.saving;
+    ahly.innerText=data.ahly;
+    telda.innerText=data.telda;
+    magdy.innerText=data.magdy;
+
+    let list=document.getElementById("list");
+    list.innerHTML="";
+
+    data.transactions.slice().reverse().forEach(t=>{
+        let div=document.createElement("div");
+        div.className="item "+t.type;
+        div.innerHTML=`<span>${t.category}</span><span>${t.amount}</span>`;
+        list.appendChild(div);
+    });
+}
+
+render();
+
+</script>
+
+</body>
+</html>
